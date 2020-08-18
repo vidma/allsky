@@ -4,10 +4,11 @@ platform = armv7
 #LDLIB = /usr/local/lib
 OPENCV = $(shell pkg-config --cflags opencv) $(shell pkg-config --libs opencv)
 USB =  -I libusb/ -L libusb/  
+LIBUSB = /usr/include/libusb-1.0/
 LIBSPATH = -L../lib/$(platform) -I../include
 DEFS = -D_LIN -D_DEBUG 
 
-CFLAGS = -Wall -Wno-psabi -g  -I $(INCLIB) -L $(LDLIB) $(DEFS) $(COMMON) $(LIBSPATH)  -lpthread  $(USB) -DGLIBC_20
+CFLAGS = -Wall -Wno-psabi -g  -I $(LIBUSB) -I $(INCLIB) -L $(LDLIB) $(DEFS) $(COMMON) $(LIBSPATH)  -lpthread  $(USB) -DGLIBC_20
 
 ifeq ($(platform), armv6)
 CC = arm-linux-gnueabihf-g++
@@ -22,10 +23,19 @@ AR= arm-linux-gnueabihf-ar
 CFLAGS += -march=armv7 -mthumb
 endif
 
-all:capture startrails keogram
+ifeq ($(platform), armv8)
+CC = arm-linux-gnueabihf-g++
+AR= arm-linux-gnueabihf-ar
+CFLAGS += -march=armv8-a
+endif
+
+all:capture captureQHY startrails keogram
 
 capture:capture.cpp
 	$(CC)  capture.cpp lib/$(platform)/libASICamera2.a -o capture $(CFLAGS) $(OPENCV) -lusb-1.0
+
+captureQHY:captureQHY.cpp
+	$(CC)  captureQHY.cpp lib/qhy/libqhyccd.a -o captureQHY $(CFLAGS) $(OPENCV) -lusb-1.0
 
 startrails:startrails.cpp
 	$(CC)  startrails.cpp -o startrails $(CFLAGS) $(OPENCV)

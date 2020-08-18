@@ -3,7 +3,7 @@ isPresent=$(lsusb -D $(lsusb | awk '/ 03c3:/ { bus=$2; dev=$4; gsub(/[^0-9]/,"",
 if [ $isPresent -eq 0 ]; then
         echo ZWO Camera not found.  Exiting. >&2
         sudo systemctl stop allsky
-        exit 0
+#        exit 0
 fi
 
 source /home/pi/allsky/config.sh
@@ -29,4 +29,4 @@ ARGUMENTS="$ARGUMENTS -daytime $DAYTIME"
 
 echo "$ARGUMENTS">>log.txt
 
-./capture $ARGUMENTS
+./captureQHY $ARGUMENTS
