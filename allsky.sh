@@ -15,12 +15,19 @@ RPiHQIsPresent=$(vcgencmd get_camera)
 if [[ $CAMERA == "RPiHQ" && $RPiHQIsPresent == "*supported=1 detected=1*" ]]; then
 echo "RPiHQ Camera not found. Exiting." >&2
         sudo systemctl stop allsky
-        exit 0
+#        exit 0
 fi
 
 ZWOIsPresent=$(lsusb -D $(lsusb | awk '/ 03c3:/ { bus=$2; dev=$4; gsub(/[^0-9]/,"",dev); print "/dev/bus/usb/"bus"/"dev;}') | grep -c 'iProduct .*ASI[0-9]')
 if [[ $CAMERA == "ZWO" &&  $ZWOIsPresent -eq 0 ]]; then
         echo "ZWO Camera not found. Exiting." >&2
+        sudo systemctl stop allsky
+        exit 0
+fi
+
+QHYIsPresent=$(lsusb | awk '/ 1618:/ { bus=$2; dev=$4; gsub(/[^0-9]/,"",dev); print "/dev/bus/usb/"bus"/"dev;}')
+if [[ $CAMERA == "QHY" &&  $QHYIsPresent -eq 0 ]]; then
+        echo "QHY Camera not found. Exiting." >&2
         sudo systemctl stop allsky
         exit 0
 fi
@@ -49,4 +56,6 @@ if [[ $CAMERA == "ZWO" ]]; then
 	$ALLSKY_HOME/capture $ARGUMENTS
 elif [[ $CAMERA == "RPiHQ" ]]; then
 	$ALLSKY_HOME/capture_RPiHQ $ARGUMENTS
+elif [[ $CAMERA == "QHY" ]]; then
+	$ALLSKY_HOME/capture_QHY $ARGUMENTS
 fi
